@@ -1,2 +1,2 @@
 # FurnitureLib
-FurnitureLibary with ProtocolLib Support. Experimental Branch by BeYkeRYkt.
+FurnitureLibary with ProtocolLib Support. Experimental fork by BeYkeRYkt.
