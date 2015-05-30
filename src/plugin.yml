@@ -4,4 +4,4 @@ description: Experimental FurnitureLib
 authors: [Ste3et_C0st, BeYkeRYkt]
 website: http://dicecraft.de
 depend: [ProtocolLib]
-main: de.Ste3et_C0st.FurnitureLib.main.FurnitureLib
+main: de.Ste3et_C0st.FurnitureLib.FurnitureLib
