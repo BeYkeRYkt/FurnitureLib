@@ -1,6 +1,7 @@
 package de.Ste3et_C0st.FurnitureLib.implementation.armorstands;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -16,6 +17,9 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 
+import de.Ste3et_C0st.FurnitureLib.FurnitureLib;
+import de.Ste3et_C0st.FurnitureLib.api.IFurnitureManager;
+import de.Ste3et_C0st.FurnitureLib.api.Utils;
 import de.Ste3et_C0st.FurnitureLib.api.armorstands.ArmorBodyPart;
 import de.Ste3et_C0st.FurnitureLib.api.armorstands.IArmorStandInventory;
 import de.Ste3et_C0st.FurnitureLib.api.armorstands.IFakeArmorStand;
@@ -37,6 +41,10 @@ public class FakeArmorStand implements IFakeArmorStand {
     private boolean fire;
     private boolean basePlate;
     private boolean gravity;
+    private float yaw;
+
+    private boolean updateMetadata;
+    private boolean updateRotation;
 
     public FakeArmorStand(Location loc, int EntityId) {
         this.location = loc;
@@ -44,7 +52,6 @@ public class FakeArmorStand implements IFakeArmorStand {
         this.entityId = EntityId;
         this.protocol = ProtocolLibrary.getProtocolManager();
         this.watcher = getDefaultWatcher(loc.getWorld(), EntityType.ARMOR_STAND);
-        this.inv = new ArmorStandInventory(this);
     }
 
     @Override
@@ -57,20 +64,14 @@ public class FakeArmorStand implements IFakeArmorStand {
         return getLocation().getChunk();
     }
 
-    private int getFixedPoint(Double d) {
-        return (int) (d * 32D);
-    }
-
-    private int getCompressedAngle(float value) {
-        return (int) (value * 256.0F / 360.0F);
-    }
-
     @Override
     public void spawn() {
         for (Player player : getLocation().getWorld().getPlayers()) {
             if (isInRange(player)) {
                 PacketContainer container = new PacketContainer(PacketType.Play.Server.SPAWN_ENTITY_LIVING);
-                container.getIntegers().write(0, this.entityId).write(1, (int) EntityType.ARMOR_STAND.getTypeId()).write(2, getFixedPoint(this.location.getX())).write(3, getFixedPoint(this.location.getY())).write(4, getFixedPoint(this.location.getZ())).write(5, getCompressedAngle(this.location.getYaw())).write(6, getCompressedAngle(this.location.getYaw())).write(7, 0);
+                container.getIntegers().write(0, this.entityId).write(1, (int) EntityType.ARMOR_STAND.getTypeId()).write(2, Utils.getFixedPoint(this.location.getX())).write(3, Utils.getFixedPoint(this.location.getY())).write(4, Utils.getFixedPoint(this.location.getZ())).write(5, 0).write(6, 0).write(7, 0);
+                container.getBytes().write(0, (byte) Utils.getCompressedAngle(getYaw())).write(1, (byte) Utils.getCompressedAngle(0)).write(2, (byte) Utils.getCompressedAngle(getYaw()));
+                container.getDataWatcherModifier().write(0, this.watcher);
                 try {
                     protocol.sendServerPacket(player, container);
                 } catch (InvocationTargetException e) {
@@ -83,7 +84,7 @@ public class FakeArmorStand implements IFakeArmorStand {
     @Override
     public void despawn() {
         for (Player player : getLocation().getWorld().getPlayers()) {
-            if (isInRange(player)) {
+            //if (isInRange(player)) {
                 PacketContainer destroy = new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY);
                 destroy.getIntegerArrays().write(0, new int[] { this.entityId });
                 try {
@@ -91,7 +92,7 @@ public class FakeArmorStand implements IFakeArmorStand {
                 } catch (InvocationTargetException e) {
                     e.printStackTrace();
                 }
-            }
+            //}
         }
     }
 
@@ -145,6 +146,9 @@ public class FakeArmorStand implements IFakeArmorStand {
 
     @Override
     public IArmorStandInventory getInventory() {
+        if (inv == null) {
+            inv = new ArmorStandInventory(this);
+        }
         return inv;
     }
 
@@ -168,6 +172,9 @@ public class FakeArmorStand implements IFakeArmorStand {
         }
         this.watcher.setObject(0, Byte.valueOf(b0));
         this.fire = flag;
+        if (!this.updateMetadata) {
+            this.updateMetadata = true;
+        }
     }
 
     @Override
@@ -177,7 +184,11 @@ public class FakeArmorStand implements IFakeArmorStand {
 
     @Override
     public void setNameVisible(boolean flag) {
+        this.watcher.setObject(3, (byte) 1);
         this.nameVisible = flag;
+        if (!this.updateMetadata) {
+            this.updateMetadata = true;
+        }
     }
 
     @Override
@@ -196,15 +207,18 @@ public class FakeArmorStand implements IFakeArmorStand {
         }
         this.watcher.setObject(0, Byte.valueOf(b0));
         this.invisible = flag;
+        if (!this.updateMetadata) {
+            this.updateMetadata = true;
+        }
     }
 
     @Override
-    public boolean isMini() {
+    public boolean isSmall() {
         return this.mini;
     }
 
     @Override
-    public void setMini(boolean flag) {
+    public void setSmall(boolean flag) {
         byte b0 = this.watcher.getByte(10);
 
         if (flag)
@@ -214,6 +228,9 @@ public class FakeArmorStand implements IFakeArmorStand {
         }
         this.watcher.setObject(10, Byte.valueOf(b0));
         this.mini = flag;
+        if (!this.updateMetadata) {
+            this.updateMetadata = true;
+        }
     }
 
     @Override
@@ -232,6 +249,9 @@ public class FakeArmorStand implements IFakeArmorStand {
         }
         this.watcher.setObject(10, Byte.valueOf(b0));
         this.arms = flag;
+        if (!this.updateMetadata) {
+            this.updateMetadata = true;
+        }
     }
 
     @Override
@@ -243,13 +263,16 @@ public class FakeArmorStand implements IFakeArmorStand {
     public void setBasePlate(boolean flag) {
         byte b0 = this.watcher.getByte(10);
 
-        if (flag)
+        if (!flag)
             b0 = (byte) (b0 | 0x08);
         else {
             b0 = (byte) (b0 & 0xFFFFFFF7);
         }
         this.watcher.setObject(10, Byte.valueOf(b0));
         this.basePlate = flag;
+        if (!this.updateMetadata) {
+            this.updateMetadata = true;
+        }
     }
 
     @Override
@@ -268,24 +291,14 @@ public class FakeArmorStand implements IFakeArmorStand {
         }
         this.watcher.setObject(10, Byte.valueOf(b0));
         this.gravity = flag;
+        if (!this.updateMetadata) {
+            this.updateMetadata = true;
+        }
     }
 
     @Override
     public boolean isInRange(Player player) {
         return getLocation().getWorld() == player.getLocation().getWorld() && (getLocation().distance(player.getLocation()) <= 48D);
-    }
-
-    @Override
-    public void setYaw(Player player, double yaw) {
-        try {
-            PacketContainer packet = protocol.createPacket(PacketType.Play.Server.ENTITY_HEAD_ROTATION);
-            packet.getIntegers().write(0, this.entityId);
-            packet.getBytes().write(0, (byte) getCompressedAngle(getLocation().getYaw()));
-            player.sendMessage(getCompressedAngle(getLocation().getYaw()) + "");
-            protocol.sendServerPacket(player, packet);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public WrappedDataWatcher getDefaultWatcher(World world, EntityType type) {
@@ -300,16 +313,147 @@ public class FakeArmorStand implements IFakeArmorStand {
     }
 
     @Override
-    public void update(Player player) {
+    public void update(Collection<Player> list) {
+        for (Player player : getLocation().getWorld().getPlayers()) {
+            if (isInRange(player)) {
+                if (updateMetadata) {
+                    PacketContainer update = new PacketContainer(PacketType.Play.Server.ENTITY_METADATA);
+                    update.getIntegers().write(0, getEntityID());
+                    update.getWatchableCollectionModifier().write(0, this.watcher.getWatchableObjects());
+                    sendPacket(player, update);
+                }
+
+                if (updateRotation) {
+                    PacketContainer update = new PacketContainer(PacketType.Play.Server.ENTITY_MOVE_LOOK);
+                    update.getIntegers().write(0, getEntityID());
+                    update.getBytes().write(0, (byte) 0);
+                    update.getBytes().write(1, (byte) 0);
+                    update.getBytes().write(2, (byte) 0);
+                    update.getBytes().write(3, (byte) Utils.getCompressedAngle(getYaw()));
+                    update.getBytes().write(4, (byte) Utils.getCompressedAngle(0));// DEV
+                    sendPacket(player, update);
+                }
+                getInventory().update(player);
+            }
+        }
+        updateMetadata = false;
+        updateRotation = false;
+    }
+
+    @Override
+    public void update() {
+        update(getLocation().getWorld().getPlayers());
+    }
+
+    @Override
+    public void setYaw(float yaw) {
+        this.yaw = yaw;
+        if (!updateRotation) {
+            this.updateRotation = true;
+        }
+    }
+
+    @Override
+    public float getYaw() {
+        return yaw;
+    }
+
+    public void sendPacket(Player player, PacketContainer packet) {
         try {
-            PacketContainer update = new PacketContainer(PacketType.Play.Server.ENTITY_METADATA);
-            update.getIntegers().write(0, getEntityID());
-            update.getWatchableCollectionModifier().write(0, this.watcher.getWatchableObjects());
-            protocol.sendServerPacket(player, update);
-            getInventory().update(player);
+            protocol.sendServerPacket(player, packet);
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (arms ? 1231 : 1237);
+        result = prime * result + (basePlate ? 1231 : 1237);
+        result = prime * result + ((displayName == null) ? 0 : displayName.hashCode());
+        result = prime * result + ((entityId == null) ? 0 : entityId.hashCode());
+        result = prime * result + (fire ? 1231 : 1237);
+        result = prime * result + (gravity ? 1231 : 1237);
+        result = prime * result + ((inv == null) ? 0 : inv.hashCode());
+        result = prime * result + (invisible ? 1231 : 1237);
+        result = prime * result + ((location == null) ? 0 : location.hashCode());
+        result = prime * result + (mini ? 1231 : 1237);
+        result = prime * result + (nameVisible ? 1231 : 1237);
+        result = prime * result + Float.floatToIntBits(yaw);
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof FakeArmorStand)) {
+            return false;
+        }
+        FakeArmorStand other = (FakeArmorStand) obj;
+        if (arms != other.arms) {
+            return false;
+        }
+        if (basePlate != other.basePlate) {
+            return false;
+        }
+        if (displayName == null) {
+            if (other.displayName != null) {
+                return false;
+            }
+        } else if (!displayName.equals(other.displayName)) {
+            return false;
+        }
+        if (entityId == null) {
+            if (other.entityId != null) {
+                return false;
+            }
+        } else if (!entityId.equals(other.entityId)) {
+            return false;
+        }
+        if (fire != other.fire) {
+            return false;
+        }
+        if (gravity != other.gravity) {
+            return false;
+        }
+        if (inv == null) {
+            if (other.inv != null) {
+                return false;
+            }
+        } else if (!inv.equals(other.inv)) {
+            return false;
+        }
+        if (invisible != other.invisible) {
+            return false;
+        }
+        if (location == null) {
+            if (other.location != null) {
+                return false;
+            }
+        } else if (!location.equals(other.location)) {
+            return false;
+        }
+        if (mini != other.mini) {
+            return false;
+        }
+        if (nameVisible != other.nameVisible) {
+            return false;
+        }
+        if (Float.floatToIntBits(yaw) != Float.floatToIntBits(other.yaw)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public IFurnitureManager getFurnitureManager() {
+        return FurnitureLib.getFurnitureManager();
+    }
 }

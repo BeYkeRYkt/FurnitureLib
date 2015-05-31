@@ -2,6 +2,8 @@ package de.Ste3et_C0st.FurnitureLib.implementation.armorstands;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.bukkit.Material;
@@ -120,14 +122,63 @@ public class ArmorStandInventory implements IArmorStandInventory {
     }
 
     @Override
+    public void update(Collection<Player> list) {
+        for (Player player : list) {
+            if (stand.isInRange(player)) {
+                update(player);
+            }
+        }
+    }
+
+    @Override
+    public void update() {
+        update(stand.getLocation().getWorld().getPlayers());
+    }
+
+    @Override
     public void update(Player player) {
         try {
             for (PacketContainer packet : createPackets(stand.getEntityID())) {
                 stand.getProtocolManager().sendServerPacket(player, packet);
             }
         } catch (InvocationTargetException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + Arrays.hashCode(items);
+        result = prime * result + ((stand == null) ? 0 : stand.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof ArmorStandInventory)) {
+            return false;
+        }
+        ArmorStandInventory other = (ArmorStandInventory) obj;
+        if (!Arrays.equals(items, other.items)) {
+            return false;
+        }
+        if (stand == null) {
+            if (other.stand != null) {
+                return false;
+            }
+        } else if (!stand.equals(other.stand)) {
+            return false;
+        }
+        return true;
+    }
+    
+    
 }

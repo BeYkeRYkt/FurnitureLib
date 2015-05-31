@@ -1,5 +1,7 @@
 package de.Ste3et_C0st.FurnitureLib.api.armorstands;
 
+import java.util.Collection;
+
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -32,4 +34,8 @@ public interface IArmorStandInventory {
     public boolean isEmpty();
 
     public void update(Player player);
+
+    public void update(Collection<Player> list);
+
+    public void update();
 }

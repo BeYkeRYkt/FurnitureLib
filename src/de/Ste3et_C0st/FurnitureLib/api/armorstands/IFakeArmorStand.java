@@ -1,9 +1,13 @@
 package de.Ste3et_C0st.FurnitureLib.api.armorstands;
 
+import java.util.Collection;
+
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.EulerAngle;
+
+import de.Ste3et_C0st.FurnitureLib.api.IFurnitureManager;
 
 public interface IFakeArmorStand {
 
@@ -39,9 +43,9 @@ public interface IFakeArmorStand {
 
     public void setInvisible(boolean flag);
 
-    public boolean isMini();
+    public boolean isSmall();
 
-    public void setMini(boolean flag);
+    public void setSmall(boolean flag);
 
     public boolean hasArms();
 
@@ -57,7 +61,13 @@ public interface IFakeArmorStand {
 
     public boolean isInRange(Player player);
 
-    public void setYaw(Player player, double yaw);
+    public void setYaw(float yaw);
 
-    public void update(Player player);
+    public float getYaw();
+
+    public void update(Collection<Player> list);
+
+    public void update();
+    
+    public IFurnitureManager getFurnitureManager();
 }

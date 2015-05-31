@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.bukkit.Location;
 
+import de.Ste3et_C0st.FurnitureLib.api.IFurnitureManager;
 import de.Ste3et_C0st.FurnitureLib.api.armorstands.IFakeArmorStand;
 
 public interface IFurnitureObject {
@@ -17,5 +18,6 @@ public interface IFurnitureObject {
     public void destroyFurniture();
 
     public List<IFakeArmorStand> getArmorStands();
-
+    
+    public IFurnitureManager getFurnitureManager();
 }
