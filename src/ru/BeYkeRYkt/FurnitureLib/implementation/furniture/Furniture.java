@@ -1,8 +1,8 @@
-package de.Ste3et_C0st.FurnitureLib.implementation.furniture;
+package ru.BeYkeRYkt.FurnitureLib.implementation.furniture;
 
-import de.Ste3et_C0st.FurnitureLib.FurnitureLib;
-import de.Ste3et_C0st.FurnitureLib.api.IFurnitureManager;
-import de.Ste3et_C0st.FurnitureLib.api.furniture.IFurniture;
+import ru.BeYkeRYkt.FurnitureLib.FurnitureLib;
+import ru.BeYkeRYkt.FurnitureLib.api.IFurnitureManager;
+import ru.BeYkeRYkt.FurnitureLib.api.furniture.IFurniture;
 
 public abstract class Furniture implements IFurniture {
 
@@ -23,7 +23,7 @@ public abstract class Furniture implements IFurniture {
     public String getId() {
         return id;
     }
-    
+
     @Override
     public IFurnitureManager getFurnitureManager() {
         return FurnitureLib.getFurnitureManager();
@@ -66,6 +66,5 @@ public abstract class Furniture implements IFurniture {
         }
         return true;
     }
-    
-    
+
 }

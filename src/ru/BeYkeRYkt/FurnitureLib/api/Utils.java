@@ -1,4 +1,4 @@
-package de.Ste3et_C0st.FurnitureLib.api;
+package ru.BeYkeRYkt.FurnitureLib.api;
 
 public class Utils {
 

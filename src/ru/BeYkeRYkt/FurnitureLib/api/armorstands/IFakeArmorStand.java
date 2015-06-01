@@ -1,4 +1,4 @@
-package de.Ste3et_C0st.FurnitureLib.api.armorstands;
+package ru.BeYkeRYkt.FurnitureLib.api.armorstands;
 
 import java.util.Collection;
 
@@ -7,7 +7,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.EulerAngle;
 
-import de.Ste3et_C0st.FurnitureLib.api.IFurnitureManager;
+import ru.BeYkeRYkt.FurnitureLib.api.IFurnitureManager;
+import ru.BeYkeRYkt.FurnitureLib.api.furniture.IFurnitureObject;
 
 public interface IFakeArmorStand {
 
@@ -15,9 +16,9 @@ public interface IFakeArmorStand {
 
     public Chunk getChunk();
 
-    public void spawn();
+    public void spawn(Player player);
 
-    public void despawn();
+    public void despawn(Player player);
 
     public EulerAngle getAngle(ArmorBodyPart part);
 
@@ -59,8 +60,6 @@ public interface IFakeArmorStand {
 
     public void setGravity(boolean flag);
 
-    public boolean isInRange(Player player);
-
     public void setYaw(float yaw);
 
     public float getYaw();
@@ -68,6 +67,12 @@ public interface IFakeArmorStand {
     public void update(Collection<Player> list);
 
     public void update();
-    
+
     public IFurnitureManager getFurnitureManager();
+
+    public IFurnitureObject getFurnitureObject();
+
+    public void setFurnitureObject(IFurnitureObject object);
+
+    public boolean hasFurnitureObject();
 }

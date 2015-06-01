@@ -1,4 +1,4 @@
-package de.Ste3et_C0st.FurnitureLib.api.armorstands;
+package ru.BeYkeRYkt.FurnitureLib.api.armorstands;
 
 import java.util.Collection;
 

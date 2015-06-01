@@ -1,4 +1,4 @@
-package de.Ste3et_C0st.FurnitureLib.api.armorstands;
+package ru.BeYkeRYkt.FurnitureLib.api.armorstands;
 
 public enum ArmorBodyPart {
     HEAD("Head", 11), BODY("Body", 12), LEFT_ARM("Left_Arm", 13), RIGHT_ARM("Right_Arm", 14), LEFT_LEG("Left_Leg", 15), RIGHT_LEG("Right_Leg", 16);

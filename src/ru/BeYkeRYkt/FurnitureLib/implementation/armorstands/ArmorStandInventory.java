@@ -1,4 +1,4 @@
-package de.Ste3et_C0st.FurnitureLib.implementation.armorstands;
+package ru.BeYkeRYkt.FurnitureLib.implementation.armorstands;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -10,10 +10,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import ru.BeYkeRYkt.FurnitureLib.api.armorstands.IArmorStandInventory;
+
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
-
-import de.Ste3et_C0st.FurnitureLib.api.armorstands.IArmorStandInventory;
 
 public class ArmorStandInventory implements IArmorStandInventory {
 
@@ -124,15 +124,13 @@ public class ArmorStandInventory implements IArmorStandInventory {
     @Override
     public void update(Collection<Player> list) {
         for (Player player : list) {
-            if (stand.isInRange(player)) {
-                update(player);
-            }
+            update(player);
         }
     }
 
     @Override
     public void update() {
-        update(stand.getLocation().getWorld().getPlayers());
+        update(stand.getFurnitureObject().getPlayers());
     }
 
     @Override
@@ -179,6 +177,5 @@ public class ArmorStandInventory implements IArmorStandInventory {
         }
         return true;
     }
-    
-    
+
 }
