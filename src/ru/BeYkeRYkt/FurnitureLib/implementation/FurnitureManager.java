@@ -115,4 +115,16 @@ public class FurnitureManager implements IFurnitureManager {
             object.update();
         }
     }
+
+    @Override
+    public IFakeArmorStand getSitStand(Player player) {
+        for (IFurnitureObject object : objects) {
+            if (object.getSitStand() != null && object.getSitStand().getPassenger() != null) {
+                if (object.getSitStand().getPassenger().getName().equals(player.getName())) {
+                    return object.getSitStand();
+                }
+            }
+        }
+        return null;
+    }
 }

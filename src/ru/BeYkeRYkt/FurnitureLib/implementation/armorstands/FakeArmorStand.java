@@ -42,11 +42,15 @@ public class FakeArmorStand implements IFakeArmorStand {
     private boolean fire;
     private boolean basePlate;
     private boolean gravity;
-    private float yaw;
+    // private float yaw;
 
     private boolean updateMetadata;
     private boolean updateRotation;
+    private boolean setPassenger;
+    private boolean leavePassenger;
+
     private IFurnitureObject object;
+    private Player passenger;
 
     public FakeArmorStand(Location loc, int EntityId) {
         this.location = loc;
@@ -128,6 +132,10 @@ public class FakeArmorStand implements IFakeArmorStand {
                 this.ea[4] = angle;
             case RIGHT_ARM:
                 this.ea[5] = angle;
+        }
+        this.watcher.setObject(part.getField(), Utils.getVectorf3(angle));
+        if (!this.updateMetadata) {
+            this.updateMetadata = true;
         }
     }
 
@@ -308,12 +316,12 @@ public class FakeArmorStand implements IFakeArmorStand {
     @Override
     public void update(Collection<Player> list) {
         for (Player player : list) {
-            // if (isInRange(player)) {
             if (updateMetadata) {
                 PacketContainer update = new PacketContainer(PacketType.Play.Server.ENTITY_METADATA);
                 update.getIntegers().write(0, getEntityID());
                 update.getWatchableCollectionModifier().write(0, this.watcher.getWatchableObjects());
                 sendPacket(player, update);
+                updateMetadata = false;
             }
 
             if (updateRotation) {
@@ -325,12 +333,28 @@ public class FakeArmorStand implements IFakeArmorStand {
                 update.getBytes().write(3, (byte) Utils.getCompressedAngle(getYaw()));
                 update.getBytes().write(4, (byte) Utils.getCompressedAngle(0));// DEV
                 sendPacket(player, update);
+                updateRotation = false;
             }
+
+            if (leavePassenger) {
+                PacketContainer packet = new PacketContainer(PacketType.Play.Server.ATTACH_ENTITY);
+                packet.getModifier().writeDefaults();
+                packet.getIntegers().write(0, 0).write(1, passenger.getEntityId()).write(2, -1);
+                sendPacket(player, packet);
+                this.passenger = null;
+                leavePassenger = false;
+            }
+
+            if (setPassenger) {
+                PacketContainer packet = new PacketContainer(PacketType.Play.Server.ATTACH_ENTITY);
+                packet.getModifier().writeDefaults();
+                packet.getIntegers().write(0, 0).write(1, passenger.getEntityId()).write(2, getEntityID());
+                sendPacket(player, packet);
+                setPassenger = false;
+            }
+
             getInventory().update(player);
-            // }
         }
-        updateMetadata = false;
-        updateRotation = false;
     }
 
     @Override
@@ -340,7 +364,7 @@ public class FakeArmorStand implements IFakeArmorStand {
 
     @Override
     public void setYaw(float yaw) {
-        this.yaw = yaw;
+        this.getLocation().setYaw(yaw);
         if (!updateRotation) {
             this.updateRotation = true;
         }
@@ -348,7 +372,7 @@ public class FakeArmorStand implements IFakeArmorStand {
 
     @Override
     public float getYaw() {
-        return yaw;
+        return getLocation().getYaw();
     }
 
     public void sendPacket(Player player, PacketContainer packet) {
@@ -423,6 +447,26 @@ public class FakeArmorStand implements IFakeArmorStand {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void setPassenger(Player entity) {
+        if (entity == null && passenger != null) {
+            this.leavePassenger = true;
+        } else if (entity != null && passenger == null) {
+            IFakeArmorStand stand = getFurnitureManager().getSitStand(entity);
+            if (stand != null) {
+                stand.setPassenger(null);
+                return;
+            }
+            this.passenger = entity;
+            this.setPassenger = true;
+        }
+    }
+
+    @Override
+    public Player getPassenger() {
+        return passenger;
     }
 
 }

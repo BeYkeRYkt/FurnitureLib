@@ -29,6 +29,8 @@ public interface IFurnitureManager {
 
     public IFakeArmorStand getArmorStand(int entityId);
 
+    public IFakeArmorStand getSitStand(Player player);
+
     // etc.
     public void updateFurnitures();
 

@@ -17,7 +17,7 @@ public class FurnitureUnknownId extends Furniture {
     }
 
     @Override
-    public boolean onPlaceCheck(Player player, IFurnitureObject object) {
+    public boolean onPlaceCheck(Player player, Location location) {
         return true;
     }
 
@@ -39,7 +39,7 @@ public class FurnitureUnknownId extends Furniture {
     }
 
     @Override
-    public List<IFakeArmorStand> collectArmorStands(Location centerLoc) {
+    public List<IFakeArmorStand> collectArmorStands(Location centerLoc, IFurnitureObject object) {
         List<IFakeArmorStand> list = new ArrayList<IFakeArmorStand>();
         IFakeArmorStand stand = getFurnitureManager().createArmorStand(centerLoc);
         stand.setDisplayName(getDisplayName());

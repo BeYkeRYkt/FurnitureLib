@@ -7,7 +7,9 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.util.EulerAngle;
 
+import ru.BeYkeRYkt.FurnitureLib.api.armorstands.ArmorBodyPart;
 import ru.BeYkeRYkt.FurnitureLib.api.armorstands.IFakeArmorStand;
 import ru.BeYkeRYkt.FurnitureLib.api.furniture.IFurnitureObject;
 import ru.BeYkeRYkt.FurnitureLib.implementation.furniture.Furniture;
@@ -19,12 +21,13 @@ public class FurnitureTest extends Furniture {
     }
 
     @Override
-    public List<IFakeArmorStand> collectArmorStands(Location centerLoc) {
+    public List<IFakeArmorStand> collectArmorStands(Location centerLoc, IFurnitureObject object) {
         List<IFakeArmorStand> list = new CopyOnWriteArrayList<IFakeArmorStand>();
 
         Location loc = new Location(centerLoc.getWorld(), centerLoc.getX(), centerLoc.getY(), centerLoc.getZ());
         IFakeArmorStand stand = getFurnitureManager().createArmorStand(loc);
         stand.setDisplayName("FurnitureLibTest");
+        stand.setAngle(ArmorBodyPart.LEFT_ARM, new EulerAngle(1, 1, 1));
         stand.setNameVisible(true);
         stand.setArms(true);
         stand.setBasePlate(false);
@@ -53,7 +56,7 @@ public class FurnitureTest extends Furniture {
     }
 
     @Override
-    public boolean onPlaceCheck(Player player, IFurnitureObject object) {
+    public boolean onPlaceCheck(Player player, Location location) {
         return true;
     }
 

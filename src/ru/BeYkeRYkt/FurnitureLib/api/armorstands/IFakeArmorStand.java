@@ -75,4 +75,8 @@ public interface IFakeArmorStand {
     public void setFurnitureObject(IFurnitureObject object);
 
     public boolean hasFurnitureObject();
+
+    public void setPassenger(Player entity);
+
+    public Player getPassenger();
 }

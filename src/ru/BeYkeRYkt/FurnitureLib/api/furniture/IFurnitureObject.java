@@ -36,5 +36,9 @@ public interface IFurnitureObject {
 
     public List<Player> getPlayers();
 
+    public IFakeArmorStand getSitStand();
+
+    public void setSitStand(IFakeArmorStand stand);
+
     public void update();
 }

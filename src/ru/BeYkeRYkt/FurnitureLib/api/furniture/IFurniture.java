@@ -17,7 +17,7 @@ public interface IFurniture {
 
     public IFurnitureManager getFurnitureManager();
 
-    public boolean onPlaceCheck(Player player, IFurnitureObject object);
+    public boolean onPlaceCheck(Player player, Location location);
 
     public void onFurnitureCreateByPlugin(IFurnitureObject object);
 
@@ -27,6 +27,6 @@ public interface IFurniture {
 
     public void onFurnitureDamage(Entity damager, IFurnitureObject object);
 
-    public List<IFakeArmorStand> collectArmorStands(Location centerLoc);
+    public List<IFakeArmorStand> collectArmorStands(Location centerLoc, IFurnitureObject objec);
 
 }

@@ -22,12 +22,13 @@ public class FurnitureObject implements IFurnitureObject {
     private List<Player> players;
     // private List<Player> removePlayers;
     private boolean spawned;
+    private IFakeArmorStand sitStand;
 
     public FurnitureObject(Location centerLoc, IFurniture furniture) {
         this.loc = centerLoc;
         this.furniture = furniture;
         this.players = new CopyOnWriteArrayList<Player>();
-        this.list = getFurniture().collectArmorStands(getCenterLocation());
+        this.list = getFurniture().collectArmorStands(getCenterLocation(), this);
     }
 
     @Override
@@ -183,6 +184,16 @@ public class FurnitureObject implements IFurnitureObject {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public IFakeArmorStand getSitStand() {
+        return sitStand;
+    }
+
+    @Override
+    public void setSitStand(IFakeArmorStand stand) {
+        this.sitStand = stand;
     }
 
 }
