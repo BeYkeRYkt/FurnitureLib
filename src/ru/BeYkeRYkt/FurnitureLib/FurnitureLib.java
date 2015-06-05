@@ -1,24 +1,13 @@
 package ru.BeYkeRYkt.FurnitureLib;
 
-import java.util.Random;
-
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import ru.BeYkeRYkt.FurnitureLib.api.IFurnitureManager;
-import ru.BeYkeRYkt.FurnitureLib.api.Utils;
 import ru.BeYkeRYkt.FurnitureLib.api.armorstands.IFakeArmorStand;
 import ru.BeYkeRYkt.FurnitureLib.api.furniture.IFurnitureObject;
 import ru.BeYkeRYkt.FurnitureLib.implementation.FurnitureManager;
 import ru.BeYkeRYkt.FurnitureLib.implementation.furniture.FurnitureUnknownId;
-import ru.BeYkeRYkt.FurnitureLib.test.FurnitureChair;
-import ru.BeYkeRYkt.FurnitureLib.test.FurnitureTest;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -27,14 +16,13 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers.EntityUseAction;
 
-public class FurnitureLib extends JavaPlugin implements Listener {
+public class FurnitureLib extends JavaPlugin {
 
     private static IFurnitureManager manager;
 
     @Override
     public void onEnable() {
         FurnitureLib.manager = new FurnitureManager();
-        getServer().getPluginManager().registerEvents(this, this);
 
         ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(this, ListenerPriority.NORMAL, PacketType.Play.Client.USE_ENTITY) {
 
@@ -69,15 +57,20 @@ public class FurnitureLib extends JavaPlugin implements Listener {
                 if (event.getPacketType() == PacketType.Play.Client.STEER_VEHICLE) {
                     if (event.getPacket().getSpecificModifier(boolean.class).read(1)) {
                         Player p = event.getPlayer();
-                        getFurnitureManager().getSitStand(p).setPassenger(null);
+                        IFakeArmorStand stand = getFurnitureManager().getSitStand(p);
+                        if (stand != null) {
+                            stand.setPassenger(null);
+                        }
                     }
                 }
             }
         });
 
-        getFurnitureManager().registerFurniture(new FurnitureUnknownId());
-        getFurnitureManager().registerFurniture(new FurnitureTest());
-        getFurnitureManager().registerFurniture(new FurnitureChair());
+        getFurnitureManager().registerFurniture(new FurnitureUnknownId());// for
+                                                                          // unknown
+                                                                          // furniture
+                                                                          // id
+
         getServer().getScheduler().runTaskTimer(this, new Runnable() {
 
             @Override
@@ -90,28 +83,4 @@ public class FurnitureLib extends JavaPlugin implements Listener {
     public static IFurnitureManager getFurnitureManager() {
         return manager;
     }
-
-    @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            if (event.getPlayer().getItemInHand() != null && event.getPlayer().getItemInHand().getType() == Material.WOOD_HOE) {
-                Location loc = event.getClickedBlock().getLocation().add(0, 1, 0);
-                loc.setYaw(event.getPlayer().getLocation().getYaw());
-                Random r = new Random();
-                int c = r.nextInt(3);
-                if (c == 0) {
-                    loc = Utils.getCenter(loc, false);
-                    getFurnitureManager().spawnFurniture(loc, "test1", event.getPlayer());
-                } else if (c == 1) {
-                    // for call unknown...
-                    loc = Utils.getCenter(loc, false);
-                    getFurnitureManager().spawnFurniture(loc, "devTest", event.getPlayer());
-                } else {
-                    loc = Utils.getCenter(loc, true);
-                    getFurnitureManager().spawnFurniture(loc, "chair", event.getPlayer());
-                }
-            }
-        }
-    }
-
 }

@@ -70,6 +70,7 @@ public class FakeArmorStand implements IFakeArmorStand {
         return getLocation().getChunk();
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void spawn(Player player) {
         // if (isInRange(player)) {
@@ -77,11 +78,7 @@ public class FakeArmorStand implements IFakeArmorStand {
         container.getIntegers().write(0, this.entityId).write(1, (int) EntityType.ARMOR_STAND.getTypeId()).write(2, Utils.getFixedPoint(this.location.getX())).write(3, Utils.getFixedPoint(this.location.getY())).write(4, Utils.getFixedPoint(this.location.getZ())).write(5, 0).write(6, 0).write(7, 0);
         container.getBytes().write(0, (byte) Utils.getCompressedAngle(getYaw())).write(1, (byte) Utils.getCompressedAngle(0)).write(2, (byte) Utils.getCompressedAngle(getYaw()));
         container.getDataWatcherModifier().write(0, this.watcher);
-        try {
-            protocol.sendServerPacket(player, container);
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
+        sendPacket(player, container);
         // }
     }
 
@@ -90,11 +87,7 @@ public class FakeArmorStand implements IFakeArmorStand {
         // if (isInRange(player)) {
         PacketContainer destroy = new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY);
         destroy.getIntegerArrays().write(0, new int[] { this.entityId });
-        try {
-            protocol.sendServerPacket(player, destroy);
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
+        sendPacket(player, destroy);
         // }
     }
 
@@ -316,45 +309,52 @@ public class FakeArmorStand implements IFakeArmorStand {
     @Override
     public void update(Collection<Player> list) {
         for (Player player : list) {
-            if (updateMetadata) {
-                PacketContainer update = new PacketContainer(PacketType.Play.Server.ENTITY_METADATA);
-                update.getIntegers().write(0, getEntityID());
-                update.getWatchableCollectionModifier().write(0, this.watcher.getWatchableObjects());
-                sendPacket(player, update);
-                updateMetadata = false;
-            }
+            if (player.isOnline()) {
+                if (updateMetadata) {
+                    updateMetadata(player);
+                }
 
-            if (updateRotation) {
-                PacketContainer update = new PacketContainer(PacketType.Play.Server.ENTITY_MOVE_LOOK);
-                update.getIntegers().write(0, getEntityID());
-                update.getBytes().write(0, (byte) 0);
-                update.getBytes().write(1, (byte) 0);
-                update.getBytes().write(2, (byte) 0);
-                update.getBytes().write(3, (byte) Utils.getCompressedAngle(getYaw()));
-                update.getBytes().write(4, (byte) Utils.getCompressedAngle(0));// DEV
-                sendPacket(player, update);
-                updateRotation = false;
-            }
+                if (updateRotation) {
+                    updateRotation(player);
+                }
 
-            if (leavePassenger) {
-                PacketContainer packet = new PacketContainer(PacketType.Play.Server.ATTACH_ENTITY);
-                packet.getModifier().writeDefaults();
-                packet.getIntegers().write(0, 0).write(1, passenger.getEntityId()).write(2, -1);
-                sendPacket(player, packet);
-                this.passenger = null;
-                leavePassenger = false;
-            }
+                if (setPassenger) {
+                    updatePassenger(player);
+                }
 
-            if (setPassenger) {
-                PacketContainer packet = new PacketContainer(PacketType.Play.Server.ATTACH_ENTITY);
-                packet.getModifier().writeDefaults();
-                packet.getIntegers().write(0, 0).write(1, passenger.getEntityId()).write(2, getEntityID());
-                sendPacket(player, packet);
-                setPassenger = false;
+                if (leavePassenger) {
+                    PacketContainer packet = new PacketContainer(PacketType.Play.Server.ATTACH_ENTITY);
+                    packet.getModifier().writeDefaults();
+                    packet.getIntegers().write(0, 0).write(1, passenger.getEntityId()).write(2, -1);
+                    sendPacket(player, packet);
+                }
+                getInventory().update(player);
             }
-
-            getInventory().update(player);
         }
+
+        if (getPassenger() != null) {
+            if (!getPassenger().isOnline()) {
+                setPassenger(null);
+            }
+        }
+
+        if (updateMetadata) {
+            updateMetadata = false;
+        }
+
+        if (updateRotation) {
+            updateRotation = false;
+        }
+
+        if (setPassenger) {
+            setPassenger = false;
+        }
+
+        if (leavePassenger) {
+            passenger = null;
+            leavePassenger = false;
+        }
+
     }
 
     @Override
@@ -467,6 +467,36 @@ public class FakeArmorStand implements IFakeArmorStand {
     @Override
     public Player getPassenger() {
         return passenger;
+    }
+
+    @Override
+    public void updateRotation(Player player) {
+        PacketContainer update = new PacketContainer(PacketType.Play.Server.ENTITY_MOVE_LOOK);
+        update.getModifier().writeDefaults();
+        update.getIntegers().write(0, getEntityID());
+        update.getBytes().write(0, (byte) 0);
+        update.getBytes().write(1, (byte) 0);
+        update.getBytes().write(2, (byte) 0);
+        update.getBytes().write(3, (byte) Utils.getCompressedAngle(getYaw()));
+        update.getBytes().write(4, (byte) Utils.getCompressedAngle(0));// DEV
+        sendPacket(player, update);
+    }
+
+    @Override
+    public void updateMetadata(Player player) {
+        PacketContainer update = new PacketContainer(PacketType.Play.Server.ENTITY_METADATA);
+        update.getModifier().writeDefaults();
+        update.getIntegers().write(0, getEntityID());
+        update.getWatchableCollectionModifier().write(0, this.watcher.getWatchableObjects());
+        sendPacket(player, update);
+    }
+
+    @Override
+    public void updatePassenger(Player player) {
+        PacketContainer packet = new PacketContainer(PacketType.Play.Server.ATTACH_ENTITY);
+        packet.getModifier().writeDefaults();
+        packet.getIntegers().write(0, 0).write(1, passenger.getEntityId()).write(2, getEntityID());
+        sendPacket(player, packet);
     }
 
 }

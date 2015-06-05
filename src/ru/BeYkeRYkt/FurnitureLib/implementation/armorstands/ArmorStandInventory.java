@@ -135,6 +135,8 @@ public class ArmorStandInventory implements IArmorStandInventory {
 
     @Override
     public void update(Player player) {
+        if (!player.isOnline())
+            return;
         try {
             for (PacketContainer packet : createPackets(stand.getEntityID())) {
                 stand.getProtocolManager().sendServerPacket(player, packet);

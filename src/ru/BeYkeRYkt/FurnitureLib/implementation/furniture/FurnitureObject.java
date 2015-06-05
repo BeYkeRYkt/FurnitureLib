@@ -106,8 +106,7 @@ public class FurnitureObject implements IFurnitureObject {
     @Override
     public synchronized void update() {
         if (spawned) {
-            // remove unvisible players
-            // removePlayers.clear();
+            // remove invisible players
             for (Player player : getPlayers()) {
                 if (!isInRange(player.getLocation()) || !player.isOnline()) {
                     // removePlayers.add(player);
@@ -124,6 +123,9 @@ public class FurnitureObject implements IFurnitureObject {
                     if (!getPlayers().contains(player)) {
                         spawnFurniture(player);
                         getPlayers().add(player);
+                        if (getSitStand() != null && getSitStand().getPassenger() != null) {
+                            getSitStand().updatePassenger(player);
+                        }
                     }
                 }
             }

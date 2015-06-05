@@ -64,10 +64,6 @@ public interface IFakeArmorStand {
 
     public float getYaw();
 
-    public void update(Collection<Player> list);
-
-    public void update();
-
     public IFurnitureManager getFurnitureManager();
 
     public IFurnitureObject getFurnitureObject();
@@ -79,4 +75,15 @@ public interface IFakeArmorStand {
     public void setPassenger(Player entity);
 
     public Player getPassenger();
+
+    // Updates
+    public void update(Collection<Player> list);
+
+    public void update();
+
+    public void updateRotation(Player player);
+
+    public void updateMetadata(Player player);
+
+    public void updatePassenger(Player player);
 }
