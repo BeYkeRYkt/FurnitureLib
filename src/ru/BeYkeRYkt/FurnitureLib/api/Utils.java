@@ -447,7 +447,10 @@ public class Utils {
         try {
             Class<?> Vector3f = Class.forName("net.minecraft.server." + getBukkitVersion() + ".Vector3f");
             Constructor<?> ctor = Vector3f.getConstructors()[0];
-            return ctor.newInstance((float) Math.toDegrees(angle.getX()), (float) Math.toDegrees(angle.getY()), (float) Math.toDegrees(angle.getZ()));
+            // return ctor.newInstance((float) Math.toDegrees(angle.getX()),
+            // (float) Math.toDegrees(angle.getY()), (float)
+            // Math.toDegrees(angle.getZ()));
+            return ctor.newInstance((float) angle.getX(), (float) angle.getY(), (float) angle.getZ());
         } catch (Exception e) {
             e.printStackTrace();
         }
