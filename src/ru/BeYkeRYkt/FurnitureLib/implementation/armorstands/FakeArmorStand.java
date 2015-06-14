@@ -351,6 +351,7 @@ public class FakeArmorStand implements IFakeArmorStand {
         }
 
         if (leavePassenger) {
+            passenger.teleport(getLocation().clone().add(0, 1.5, 0));
             passenger = null;
             leavePassenger = false;
         }

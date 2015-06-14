@@ -32,8 +32,8 @@ public class FurnitureLib extends JavaPlugin {
                     Integer PacketID = event.getPacket().getIntegers().read(0);
                     if (getFurnitureManager().isArmorStand(PacketID)) {
                         IFakeArmorStand stand = getFurnitureManager().getArmorStand(PacketID);
-                        IFurnitureObject object = stand.getFurnitureObject();
                         Player p = event.getPlayer();
+                        IFurnitureObject object = stand.getFurnitureObject();
                         EntityUseAction action = event.getPacket().getEntityUseActions().read(0);
                         switch (action) {
                             case ATTACK:
